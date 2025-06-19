@@ -1,0 +1,19 @@
+{
+  "name": "mapf-gpt-dev",
+  "image": "mapf-gpt",
+  "runArgs": [
+    "--platform=linux/amd64"
+  ],
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind"
+  ],
+  "extensions": [
+  "ms-python.python"
+  ],
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "postCreateCommand": "echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate pogema' >> ~/.bashrc"
+}
+

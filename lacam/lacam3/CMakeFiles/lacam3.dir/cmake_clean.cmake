@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/lacam3.dir/src/collision_table.cpp.o"
+  "CMakeFiles/lacam3.dir/src/collision_table.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/dist_table.cpp.o"
+  "CMakeFiles/lacam3.dir/src/dist_table.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/graph.cpp.o"
+  "CMakeFiles/lacam3.dir/src/graph.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/heuristic.cpp.o"
+  "CMakeFiles/lacam3.dir/src/heuristic.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/hnode.cpp.o"
+  "CMakeFiles/lacam3.dir/src/hnode.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/instance.cpp.o"
+  "CMakeFiles/lacam3.dir/src/instance.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/lacam.cpp.o"
+  "CMakeFiles/lacam3.dir/src/lacam.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/lnode.cpp.o"
+  "CMakeFiles/lacam3.dir/src/lnode.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/metrics.cpp.o"
+  "CMakeFiles/lacam3.dir/src/metrics.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/pibt.cpp.o"
+  "CMakeFiles/lacam3.dir/src/pibt.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/planner.cpp.o"
+  "CMakeFiles/lacam3.dir/src/planner.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/post_processing.cpp.o"
+  "CMakeFiles/lacam3.dir/src/post_processing.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/refiner.cpp.o"
+  "CMakeFiles/lacam3.dir/src/refiner.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/scatter.cpp.o"
+  "CMakeFiles/lacam3.dir/src/scatter.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/sipp.cpp.o"
+  "CMakeFiles/lacam3.dir/src/sipp.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/translator.cpp.o"
+  "CMakeFiles/lacam3.dir/src/translator.cpp.o.d"
+  "CMakeFiles/lacam3.dir/src/utils.cpp.o"
+  "CMakeFiles/lacam3.dir/src/utils.cpp.o.d"
+  "liblacam3.a"
+  "liblacam3.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/lacam3.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

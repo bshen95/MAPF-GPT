@@ -1,0 +1,6 @@
+/workspace/lacam/CMakeFiles/lacam.dir
+/workspace/lacam/CMakeFiles/edit_cache.dir
+/workspace/lacam/CMakeFiles/rebuild_cache.dir
+/workspace/lacam/lacam3/CMakeFiles/lacam3.dir
+/workspace/lacam/lacam3/CMakeFiles/edit_cache.dir
+/workspace/lacam/lacam3/CMakeFiles/rebuild_cache.dir

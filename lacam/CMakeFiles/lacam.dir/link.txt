@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,liblacam.so -o liblacam.so CMakeFiles/lacam.dir/main.cpp.o  lacam3/liblacam3.a -lpthread 
