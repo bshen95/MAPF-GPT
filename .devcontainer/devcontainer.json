@@ -12,8 +12,8 @@
   "ms-python.python"
   ],
   "settings": {
-    "terminal.integrated.defaultProfile.linux": "bash"
+    "terminal.integrated.defaultProfile.linux": "zsh"
   },
-  "postCreateCommand": "echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate pogema' >> ~/.bashrc"
+  "postCreateCommand": "echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate pogema' >> ~/.zshrc"
 }
 

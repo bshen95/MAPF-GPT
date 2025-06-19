@@ -8,6 +8,8 @@ RUN apt update && apt install -y \
     ffmpeg \
     libsm6 \
     libxext6 \
+    zsh \
+    curl \
     git \
     vim \
     cmake \
@@ -16,6 +18,18 @@ RUN apt update && apt install -y \
     libboost-all-dev \
     pkg-config \
     && conda install -c conda-forge pybind11
+
+# Install Zsh and Oh My Zsh
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
+    -t https://github.com/denysdovhan/spaceship-prompt \
+    -a 'SPACESHIP_PROMPT_ADD_NEWLINE="false"' \
+    -a 'SPACESHIP_PROMPT_SEPARATE_LINE="false"' \
+    -a 'CASE_SENSITIVE="true"'\
+    -p git \
+    -p ssh-agent \
+    -p https://github.com/zsh-users/zsh-autosuggestions \
+    -p https://github.com/zsh-users/zsh-completions \
+    -p https://github.com/zsh-users/zsh-syntax-highlighting
 
 RUN conda create -n pogema python=3.10 -y \
     && conda run -n pogema pip install --no-cache-dir -r /tmp/requirements.txt \
@@ -34,6 +48,6 @@ RUN wget https://github.com/microsoft/onnxruntime/releases/download/v1.14.1/onnx
     && tar -xf onnxruntime-linux-x64-1.14.1.tgz \
     && cp onnxruntime-linux-x64-1.14.1/lib/* /usr/lib/ && cp onnxruntime-linux-x64-1.14.1/include/* /usr/include/
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* "/var/tmp/*"
 
 ENTRYPOINT ["/bin/bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate pogema && exec \"$@\"", "--"]
