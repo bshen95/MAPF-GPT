@@ -201,6 +201,9 @@ def simluate_expert_algorithm():
     print(results)
 
 
+
+
+
 def main():
     # Step 1: Run LaCAM to obtain expert data in json format.
     simluate_expert_algorithm()

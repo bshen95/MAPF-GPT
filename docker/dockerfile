@@ -15,6 +15,8 @@ RUN apt update && apt install -y \
     cmake \
     g++ \
     wget \
+    zip \
+    unzip \
     libboost-all-dev \
     pkg-config \
     && conda install -c conda-forge pybind11
