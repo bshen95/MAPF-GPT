@@ -9,7 +9,7 @@ from pogema import AnimationConfig, AnimationMonitor, pogema_v0
 from pogema.generator import generate_from_possible_targets, generate_new_target
 from pogema.wrappers.metrics import AgentsDensityWrapper, RuntimeMetricWrapper
 from pogema_toolbox.create_env import MultiMapWrapper
-
+from pogema.grid import GridConfig
 
 class ProvideFutureTargetsWrapper(Wrapper):
     def _get_lifelong_global_targets_xy(self):

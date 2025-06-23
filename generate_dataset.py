@@ -26,10 +26,10 @@ TEMP_FOLDER = "temp"
 DATASET_FOLDER = "dataset"
 CONFIGS = [
     "dataset_configs/10-medium-mazes/10-medium-mazes-part1.yaml",
-    "dataset_configs/10-medium-mazes/10-medium-mazes-part2.yaml",
-    "dataset_configs/10-medium-mazes/10-medium-mazes-part3.yaml",
-    "dataset_configs/10-medium-mazes/10-medium-mazes-part4.yaml",
-    "dataset_configs/12-medium-random/12-medium-random-part1.yaml",
+    # "dataset_configs/10-medium-mazes/10-medium-mazes-part2.yaml",
+    # "dataset_configs/10-medium-mazes/10-medium-mazes-part3.yaml",
+    # "dataset_configs/10-medium-mazes/10-medium-mazes-part4.yaml",
+    # "dataset_configs/12-medium-random/12-medium-random-part1.yaml",
 ]
 
 RANDOM_MAPS_FOLDER = "dataset_configs/12-medium-random"
