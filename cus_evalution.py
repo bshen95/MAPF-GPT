@@ -146,17 +146,12 @@ def balanced_dask_backend(algo_configs, env_configs, full_algo_name):
     initialized_algo_config = ToolboxRegistry.create_algorithm_config(algo_configs[0]['name'], **algo_configs[0])
 
     num_process = min(initialized_algo_config.num_process, get_num_of_available_cpus())
-    num_process = 6
+    num_process = 12
     balanced_buckets = get_balanced_buckets_indexes(env_configs, num_process)
 
-    with dask_set({
-        "distributed.comm.timeouts.connect": "10s",
-        "distributed.comm.timeouts.tcp": "60s",
-        "distributed.comm.timeouts.handshake": "5s",
-        "distributed.comm.timeouts.heartbeat": "60s",
-    }):
-        cluster = dd.LocalCluster(n_workers=num_process, threads_per_worker=1, nthreads=1)
-        client = dd.Client(cluster, timeout="120s")  # Connect the client to the cluster
+
+    cluster = dd.LocalCluster(n_workers=num_process, threads_per_worker=1, nthreads=1)
+    client = dd.Client(cluster, timeout="120s")  # Connect the client to the cluster
 
     futures = []
 
@@ -165,13 +160,64 @@ def balanced_dask_backend(algo_configs, env_configs, full_algo_name):
     for bucket in balanced_buckets:
         bucket_configs = [env_configs[idx] for idx in bucket]
         algo_bucket_configs = [algo_configs[idx] for idx in bucket]
-        future = client.submit(sequential_backend, algo_bucket_configs, bucket_configs, full_algo_name, registry_state,
-                               pure=False)
+
+        future = client.submit(
+            sequential_backend,
+            algo_bucket_configs,
+            bucket_configs,
+            full_algo_name,
+            registry_state,
+            pure=False
+        )
         futures.append(future)
 
     results = client.gather(futures)
     client.close()
     cluster.close()
+
+
+    # with dask_set({
+    #     "distributed.comm.timeouts.connect": "20s",
+    #     "distributed.comm.timeouts.tcp": "120s",
+    #     "distributed.comm.timeouts.handshake": "10s",
+    #     "distributed.comm.timeouts.heartbeat": "60s",
+    #     "distributed.scheduler.allowed-failures": 10,
+    #     "distributed.comm.retry.count": 15,
+    #     "distributed.comm.retry.delay.min": "1s",
+    #     "distributed.comm.retry.delay.max": "10s",
+    # }):
+    #     with dd.LocalCluster(
+    #         n_workers=num_process,
+    #         threads_per_worker=1,
+    #         memory_limit="auto",
+    #         processes=True,
+    #         dashboard_address=None
+    #     ) as cluster:
+            
+    #         with dd.Client(cluster, timeout="180s") as client:
+                
+    #             ToolboxRegistry.get_maps()
+    #             registry_state = ToolboxRegistry.get_state()
+
+    #             futures = []
+    #             for bucket in balanced_buckets:
+    #                 bucket_configs = [env_configs[idx] for idx in bucket]
+    #                 algo_bucket_configs = [algo_configs[idx] for idx in bucket]
+
+    #                 future = client.submit(
+    #                     sequential_backend,
+    #                     algo_bucket_configs,
+    #                     bucket_configs,
+    #                     full_algo_name,
+    #                     registry_state,
+    #                     pure=False
+    #                 )
+    #                 futures.append(future)
+
+    #             # Wait for all tasks to finish
+    #             results = client.gather(futures)
+    #             dd.wait(futures)
+
 
     # Reorder the results according to the original order of env_configs
     ordered_results = [None for _ in range(len(env_configs))]

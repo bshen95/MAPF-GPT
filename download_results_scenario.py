@@ -15,47 +15,6 @@ MAPS_YAML = BASE_DIR + "/maps_config.yaml"
 from pogema_toolbox.generators.generator_utils import maps_dict_to_yaml
 
 
-maps_config = {
-    "maps": [
-        # "Berlin_1_256",
-        # "Boston_0_256",
-        # "Paris_1_256",
-        # "brc202d",
-        # "den312d",
-        # "den520d",
-        # "empty-16-16",
-        # "empty-32-32",
-        # "empty-48-48",
-        # "empty-8-8",
-        # "ht_chantry",
-        # "ht_mansion_n",
-        # "lak303d",
-        # "lt_gallowstemplar_n",
-        # "maze-128-128-1",
-        # "maze-128-128-10",
-        # "maze-128-128-2",
-        # "maze-32-32-2",
-        # "maze-32-32-4",
-        # "orz900d",
-        # "ost003d",
-        # "random-32-32-10",
-        "random-32-32-20",
-        "random-64-64-10",
-        "random-64-64-20",
-        "room-32-32-4",
-        "room-64-64-16",
-        "room-64-64-8",
-        # "w_woundedcoast",
-        # "warehouse-10-20-10-2-1",
-        # "warehouse-10-20-10-2-2",
-        # "warehouse-20-40-10-2-1",
-        # "warehouse-20-40-10-2-2"
-    ]
-}
-
-
-
-
 
 
 
@@ -153,7 +112,7 @@ def ensure_dirs():
     os.makedirs(SCENARIO_DIR, exist_ok=True)
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
-def download_scenarios_and_results(input_path=maps_config):
+def download_scenarios_and_results(maps_config):
     ensure_dirs()
 
     # Load map names from yaml
