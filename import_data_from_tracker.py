@@ -45,39 +45,39 @@ NUM_SPLITS = 24
 
 MAP_CONFIG = {
     "maps": [
-        {"name": "Berlin_1_256", "type": "city"},
-        {"name": "Boston_0_256", "type": "city"},
-        {"name": "Paris_1_256", "type": "city"},
-        {"name": "ht_chantry", "type": "game"},
-        {"name": "ht_mansion_n", "type": "game"},
-        {"name": "lak303d", "type": "game"},
-        {"name": "lt_gallowstemplar_n", "type": "game"},
-        {"name": "brc202d", "type": "game"},
-        {"name": "den312d", "type": "game"},
-        {"name": "den520d", "type": "game"},
-        {"name": "orz900d", "type": "game"},
-        {"name": "ost003d", "type": "game"},
-        {"name": "w_woundedcoast", "type": "game"},
+        # {"name": "Berlin_1_256", "type": "city"},
+        # {"name": "Boston_0_256", "type": "city"},
+        # {"name": "Paris_1_256", "type": "city"},
+        # {"name": "ht_chantry", "type": "game"},
+        # {"name": "ht_mansion_n", "type": "game"},
+        # {"name": "lak303d", "type": "game"},
+        # {"name": "lt_gallowstemplar_n", "type": "game"},
+        # {"name": "brc202d", "type": "game"},
+        # {"name": "den312d", "type": "game"},
+        # {"name": "den520d", "type": "game"},
+        # {"name": "orz900d", "type": "game"},
+        # {"name": "ost003d", "type": "game"},
+        # {"name": "w_woundedcoast", "type": "game"},
         {"name": "empty-16-16", "type": "empty"},
         {"name": "empty-32-32", "type": "empty"},
-        {"name": "empty-48-48", "type": "empty"},
-        {"name": "empty-8-8", "type": "empty"},
-        {"name": "maze-128-128-1", "type": "maze"},
-        {"name": "maze-128-128-10", "type": "maze"},
-        {"name": "maze-128-128-2", "type": "maze"},
-        {"name": "maze-32-32-2", "type": "maze"},
+        # {"name": "empty-48-48", "type": "empty"},
+        # {"name": "empty-8-8", "type": "empty"},
+        # {"name": "maze-128-128-1", "type": "maze"},
+        # {"name": "maze-128-128-10", "type": "maze"},
+        # {"name": "maze-128-128-2", "type": "maze"},
+        # {"name": "maze-32-32-2", "type": "maze"},
         {"name": "maze-32-32-4", "type": "maze"},
         {"name": "random-32-32-10", "type": "random"},
-        {"name": "random-32-32-20", "type": "random"},
-        {"name": "random-64-64-10", "type": "random"},
-        {"name": "random-64-64-20", "type": "random"},
+        # {"name": "random-32-32-20", "type": "random"},
+        # {"name": "random-64-64-10", "type": "random"},
+        # {"name": "random-64-64-20", "type": "random"},
         {"name": "room-32-32-4", "type": "room"},
-        {"name": "room-64-64-16", "type": "room"},
-        {"name": "room-64-64-8", "type": "room"},
+        # {"name": "room-64-64-16", "type": "room"},
+        # {"name": "room-64-64-8", "type": "room"},
         {"name": "warehouse-10-20-10-2-1", "type": "warehouse"},
-        {"name": "warehouse-10-20-10-2-2", "type": "warehouse"},
-        {"name": "warehouse-20-40-10-2-1", "type": "warehouse"},
-        {"name": "warehouse-20-40-10-2-2", "type": "warehouse"}
+        # {"name": "warehouse-10-20-10-2-2", "type": "warehouse"},
+        # {"name": "warehouse-20-40-10-2-1", "type": "warehouse"},
+        # {"name": "warehouse-20-40-10-2-2", "type": "warehouse"}
     ]
 }
 
@@ -670,11 +670,10 @@ def pogema_2_OA_pairs():
 
 def main():
     # Step 1: Download scenarios and results from tracker.
-    # maps_config = {"maps": [entry["name"] for entry in MAP_CONFIG["maps"]] }
-
-    # download_scenarios_and_results(maps_config)
+    maps_config = {"maps": [entry["name"] for entry in MAP_CONFIG["maps"]] }
+    download_scenarios_and_results(maps_config)
     # load_movingAI_maps()
-    # tracker_data_2_pogema()
+    tracker_data_2_pogema()
     pogema_2_OA_pairs()
     # process_individual_map("room-32-32-4")
     # # Step 2: Convert the csv to MAPF-GPT format.

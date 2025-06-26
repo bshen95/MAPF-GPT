@@ -16,4 +16,3 @@
   },
   "postCreateCommand": "echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate pogema' >> ~/.zshrc"
 }
-
