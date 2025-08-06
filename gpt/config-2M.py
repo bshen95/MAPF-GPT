@@ -1,8 +1,8 @@
 compile = True
-max_iters = 30000
-lr_decay_iters = 30000
+max_iters = 3000000
+lr_decay_iters = 3000000
 
-batch_size = 4096
+batch_size = 64
 n_layer = 5
 n_head = 5
 n_embd = 160

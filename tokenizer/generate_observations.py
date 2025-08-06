@@ -73,6 +73,12 @@ class ObservationGenerator:
                     agents = self.generate_agent_info(
                         agent_id, t, proximity_lists[t][agent_id], paths, goal_positions
                     )
+                    # convert goal based on limit value;
+                    for agent in agents:
+                        agent.relative_goal = (
+                            -40 if agent.relative_goal[0] < -20 else 40 if agent.relative_goal[0] > 20 else agent.relative_goal[0],
+                            -40 if agent.relative_goal[1] < -20 else 40 if agent.relative_goal[1] > 20 else agent.relative_goal[1],
+                        )
                     cost2go_obs = self.generate_cost2go_obs(
                         self.cost2go_data[tuple(paths[agent_id][-1])],
                         tuple(paths[agent_id][t]),

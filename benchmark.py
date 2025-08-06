@@ -26,11 +26,11 @@ def main(disable_wandb=False):
     )
 
     folder_names = [
-        "01-random",
+        # "01-random",
         "02-mazes",
-        "03-warehouse",
-        "04-movingai",
-        "05-puzzles",
+        # "03-warehouse",
+        # "04-movingai",
+        # "05-puzzles",
     ]
 
     for folder in folder_names:

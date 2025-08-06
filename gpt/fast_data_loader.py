@@ -8,7 +8,9 @@ import torch
 
 from loguru import logger
 from torch.utils.data import Dataset
-
+from collections import defaultdict
+from itertools import zip_longest
+from typing import List
 
 class MapfArrowDataset(torch.utils.data.Dataset):
     def __init__(self, folder_path, device, batch_size):
@@ -52,19 +54,77 @@ class MapfArrowDataset(torch.utils.data.Dataset):
     def load_and_transfer_data_file(self, filename):
         start_time = time.monotonic()
 
-        input_tensors, gt_actions = self._get_data_from_file(filename)
+        input_tensors_np, gt_actions_np = self._get_data_from_file(filename)
 
-        self.input_tensors.copy_(torch.tensor(input_tensors, dtype=self.dtype), non_blocking=True)
-        self.target_tensors[:, -1].copy_(torch.tensor(gt_actions, dtype=self.dtype), non_blocking=True)
+        input_tensor_torch = torch.tensor(input_tensors_np, dtype=self.dtype, device=self.device)
+        gt_actions_torch = torch.tensor(gt_actions_np, dtype=self.dtype, device=self.device)
+
+        # Resize internal buffers if needed
+        if input_tensor_torch.shape != self.input_tensors.shape:
+            logger.warning(f"Resizing buffers: from {self.input_tensors.shape} to {input_tensor_torch.shape}")
+            self.input_tensors = torch.empty_like(input_tensor_torch, device=self.device)
+            self.target_tensors = torch.full_like(input_tensor_torch, -1, device=self.device)
+            
+
+        # self.input_tensors.copy_(torch.tensor(input_tensors, dtype=self.dtype), non_blocking=True)
+        # self.target_tensors[:, -1].copy_(torch.tensor(gt_actions, dtype=self.dtype), non_blocking=True)
+        self.input_tensors.copy_(input_tensor_torch, non_blocking=True)
+        self.target_tensors[:, -1].copy_(gt_actions_torch, non_blocking=True)
+
         finish_time = time.monotonic() - start_time
         logger.debug(f'Data from {filename} for {self.device} device prepared in ~{round(finish_time, 5)}s')
 
+    def interleave_by_map_type(self, file_lists: List[str]) -> List[str]:
+        """
+        Interleaves dataset file paths by environment/map type
+        so that each type is processed in turns.
+
+        Args:
+            file_lists (List[str]): List of .arrow file paths.
+
+        Returns:
+            List[str]: Interleaved file list.
+        """
+        # Group by type keywords
+        env_groups = defaultdict(list)
+        for f in file_lists:
+            if 'empty' in f:
+                env_groups['empty'].append(f)
+            elif 'maze' in f:
+                env_groups['maze'].append(f)
+            elif 'random' in f:
+                env_groups['random'].append(f)
+            elif 'room' in f:
+                env_groups['room'].append(f)
+
+        # Interleave the grouped files
+        interleaved = []
+        for group in zip_longest(
+            env_groups['empty'],
+            env_groups['maze'],
+            env_groups['random'],
+            env_groups['room']
+        ):
+            interleaved.extend([x for x in group if x is not None])
+
+        return interleaved
+
     def __iter__(self):
         while True:
+            self.file_paths = self.interleave_by_map_type(self.file_paths)
             for file_path in self.file_paths:
+                logger.debug(f'Loading data from {file_path} for {self.device} device')
                 self.load_and_transfer_data_file(file_path)
-                for i in range(0, len(self.input_tensors), self.batch_size):
+                num_samples = self.input_tensors.shape[0]
+                for i in range(0, num_samples, self.batch_size):
+                    if i + self.batch_size > num_samples:
+                        continue  # Drop last incomplete batch
                     yield self.input_tensors[i:i + self.batch_size], self.target_tensors[i:i + self.batch_size]
+
+                # for i in range(0, len(self.input_tensors), self.batch_size):
+                #     if i + self.batch_size > num_samples:
+                #         continue  # Drop last incomplete batch
+                #     yield self.input_tensors[i:i + self.batch_size], self.target_tensors[i:i + self.batch_size]
 
     def get_shard_size(self):
         return len(self.input_tensors) * len(self.file_paths)

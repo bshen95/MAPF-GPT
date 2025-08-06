@@ -2,7 +2,8 @@
   "name": "mapf-gpt-dev",
   "image": "mapf-gpt",
   "runArgs": [
-    "--platform=linux/amd64"
+    "--platform=linux/amd64",
+    "--gpus=all"
   ],
   "workspaceFolder": "/workspace",
   "mounts": [

@@ -31,6 +31,11 @@ environment:
       ]
 
 algorithms:
+  Expert-V1:
+    name: MAPF-GPT
+    parallel_backend: balanced_dask
+    num_process: 4
+    path_to_weights: weights/expert-2M-v2.pt
   MAPF-GPT-2M:
     name: MAPF-GPT
     parallel_backend: balanced_dask

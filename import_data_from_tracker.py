@@ -17,7 +17,7 @@ from pogema_toolbox.eval_utils import initialize_wandb, save_evaluation_results
 from cus_evalution import evaluation
 from pogema_toolbox.registry import ToolboxRegistry
 from collections import defaultdict
-
+from zipfile import ZipFile
 
 from create_env import create_logging_env
 from expert_inference import ExpertInference, ExpertInferenceConfig
@@ -58,7 +58,8 @@ MAP_CONFIG = {
         # {"name": "orz900d", "type": "game"},
         # {"name": "ost003d", "type": "game"},
         # {"name": "w_woundedcoast", "type": "game"},
-        {"name": "empty-16-16", "type": "empty"},
+        # {"name": "empty-16-16", "type": "empty"},
+        {"name": "random-32-32-20", "type": "random"},
         {"name": "empty-32-32", "type": "empty"},
         # {"name": "empty-48-48", "type": "empty"},
         # {"name": "empty-8-8", "type": "empty"},
@@ -67,7 +68,7 @@ MAP_CONFIG = {
         # {"name": "maze-128-128-2", "type": "maze"},
         # {"name": "maze-32-32-2", "type": "maze"},
         {"name": "maze-32-32-4", "type": "maze"},
-        {"name": "random-32-32-10", "type": "random"},
+        # {"name": "random-32-32-10", "type": "random"},
         # {"name": "random-32-32-20", "type": "random"},
         # {"name": "random-64-64-10", "type": "random"},
         # {"name": "random-64-64-20", "type": "random"},
@@ -430,6 +431,7 @@ def process_scenario_results(map_name, scen_path, scenario_tasks, results):
 
 
 def create_env_config(map_name, agents, starts, targets):
+    # release size to 1024, in order to bypass validator
     return {
         'name': 'Environment',
         'with_animation': False,
@@ -477,28 +479,36 @@ def process_entire_files(map_data, map_file, output_file):
     # process the entire file, and do not remove data from file.
     # Process map files
     file, all_tensors, all_actions = process_file(map_file, map_data)
+    num_samples, tensor_len = all_tensors.shape
+    print(f"Finish processing file: {num_samples} samples, tensor length: {tensor_len}, map file: {map_file}.")
     # Combine results into dictionaries
+    print(f"Finish processing file: {map_file}")
 
+    print(f"Start shuffling the data: {map_file}")
     # Shuffle the data
     indices = np.arange(len(all_tensors))
     np.random.shuffle(indices)
     # Save the data
     all_tensors = all_tensors[indices]
     all_actions = all_actions[indices]
+    print(f"End shuffling the data: {map_file}")
 
-    # Define schema
+    print(f"Start converting the data: {map_file}")
+    # Define schema with fixed-size list using pa.list_ and list_size
     schema = pa.schema([
-        ('input_tensors', pa.list_(pa.int8())),
+        ('input_tensors', pa.list_(pa.int8(), list_size=tensor_len)),
         ('gt_actions', pa.int8())
     ])
 
-    # Convert to Arrow arrays
-    input_tensors_col = pa.array(all_tensors.tolist(), type=pa.list_(pa.int8()))
-    gt_actions_col = pa.array(all_actions)
+    # Convert all_tensors to a list-of-lists (each sublist has length tensor_len)
+    input_tensors_col = pa.array(all_tensors.tolist(), type=pa.list_(pa.int8(), list_size=tensor_len))
+    gt_actions_col = pa.array(all_actions, type=pa.int8())
 
     # Create Arrow table
     table = pa.Table.from_arrays([input_tensors_col, gt_actions_col], schema=schema)
+    print(f"Finish converting the data: {map_file}")
 
+    print(f"Exporting the data: {map_file}")
     # Save to one .arrow file
     chunk_output_file = f"{output_file}.arrow"
     with open(chunk_output_file, "wb") as f:
@@ -645,36 +655,86 @@ def worker(args):
     process_entire_files(maps, temp_path, output_path)
 
 
+def pogema_2_OA_pairs_top_10():
+    maps = load_yaml_file("movingAI/maps.yaml")
+    map_configs = load_yaml_file("movingAI/maps_config.yaml")
+    Path(DATASET_FOLDER).mkdir(parents=True, exist_ok=True) 
+    Path(TEMP_FOLDER).mkdir(parents=True, exist_ok=True)
+    for map_name in map_configs['maps']:
+        NUM_PROCESSES = 10
+        zip_path = Path(EXPERT_DATA_FOLDER) / f"{map_name}.zip"
+        print(zip_path)
+        print(f"Processing the map: {map_name}")
+        NUM_SPLITS = 4 * NUM_PROCESSES
+        split_zipped_json_array(zip_path, TEMP_FOLDER, NUM_SPLITS)
+        args_list = [
+            (maps,
+            f"{TEMP_FOLDER}/{map_name}_part_{i}.json",
+            f"{DATASET_FOLDER}/{map_name}_part_{i}")
+            for i in range(10)
+        ]
+        with mp.Pool(processes=NUM_PROCESSES, maxtasksperchild=1) as pool:
+            pool.map(worker, args_list)
+        output_zip_path = Path(DATASET_FOLDER) / f"{map_name}_parts.zip"
+
+        print(f"Starting zipped json into: {output_zip_path}")
+        with ZipFile(output_zip_path, 'w') as zipf:
+            for i in range(NUM_SPLITS):
+                json_file = Path(TEMP_FOLDER) / f"{map_name}_part_{i}.json"
+                if json_file.exists():
+                    zipf.write(json_file, arcname=json_file.name)
+                    json_file.unlink()
+        print(f"Zipped all json into: {output_zip_path}")
+
+
+
+
+
+
 def pogema_2_OA_pairs():
     maps = load_yaml_file("movingAI/maps.yaml")
     map_configs = load_yaml_file("movingAI/maps_config.yaml")
     Path(DATASET_FOLDER).mkdir(parents=True, exist_ok=True) 
     Path(TEMP_FOLDER).mkdir(parents=True, exist_ok=True)
     for map_name in map_configs['maps']:
+        NUM_PROCESSES = 10
         zip_path = Path(EXPERT_DATA_FOLDER) / f"{map_name}.zip"
         print(zip_path)
         print(f"Processing the map: {map_name}")
-        NUM_SPLITS = 2 * NUM_PROCESSES
-        split_zipped_json_array(zip_path, TEMP_FOLDER, NUM_SPLITS)
+        NUM_SPLITS = 4 * NUM_PROCESSES
+        # split_zipped_json_array(zip_path, TEMP_FOLDER, NUM_SPLITS)
         args_list = [
             (maps,
             f"{TEMP_FOLDER}/{map_name}_part_{i}.json",
             f"{DATASET_FOLDER}/{map_name}_part_{i}")
-            for i in range(NUM_SPLITS)
+            for i in range(10)
         ]
         with mp.Pool(processes=NUM_PROCESSES) as pool:
             pool.map(worker, args_list)
+        output_zip_path = Path(DATASET_FOLDER) / f"{map_name}_parts.zip"
+
+        print(f"Starting zipped json into: {output_zip_path}")
+        with ZipFile(output_zip_path, 'w') as zipf:
+            for i in range(NUM_SPLITS):
+                json_file = Path(TEMP_FOLDER) / f"{map_name}_part_{i}.json"
+                if json_file.exists():
+                    zipf.write(json_file, arcname=json_file.name)
+                    json_file.unlink()
+        print(f"Zipped all json into: {output_zip_path}")
+
+
         # process_per_scenarios_file(map_name)
         # process_per_map(map_name)
 
 
 def main():
     # Step 1: Download scenarios and results from tracker.
-    maps_config = {"maps": [entry["name"] for entry in MAP_CONFIG["maps"]] }
-    download_scenarios_and_results(maps_config)
-    # load_movingAI_maps()
-    tracker_data_2_pogema()
-    pogema_2_OA_pairs()
+    # maps_config = {"maps": [entry["name"] for entry in MAP_CONFIG["maps"]] }
+    # download_scenarios_and_results(maps_config)
+    # # load_movingAI_maps()
+    # tracker_data_2_pogema()
+    # pogema_2_OA_pairs()
+    pogema_2_OA_pairs_top_10()
     # process_individual_map("room-32-32-4")
     # # Step 2: Convert the csv to MAPF-GPT format.
     # # load_movingAI_maps()
