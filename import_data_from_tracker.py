@@ -286,6 +286,9 @@ def load_solution_csv(csv_path):
             agents = int(row["agents"])
             plan_lines = row["solution_plan"]
 
+            if agents <= 100 :
+                continue
+
             results.append({
                 "scen_path": scen_path,
                 "agents": agents,

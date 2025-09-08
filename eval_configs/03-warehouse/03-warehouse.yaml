@@ -164,6 +164,7 @@ results_views:
     drop_keys: [seed]
     print_results: True
     round_digits: 3
+
   03-warehouse-runtime:
     name: Warehouse
     type: plot
@@ -177,6 +178,33 @@ results_views:
     legend_font_size: 8
     font_size: 8
     ticks: [32, 64, 96, 128, 160, 192]
+
+  03-warehouse-SoC:
+    type: plot
+    x: num_agents
+    y: SoC
+    width: 3.0
+    height: 2.5
+    line_width: 2
+    use_log_scale_x: True
+    legend_font_size: 8
+    font_size: 8
+    name: Warehouse
+    ticks: [32, 64, 96, 128, 160, 192]
+
+  03-warehouse-CSR:
+    type: plot
+    x: num_agents
+    y: CSR
+    width: 3.0
+    height: 2.5
+    line_width: 2
+    use_log_scale_x: True
+    legend_font_size: 8
+    font_size: 8
+    name: Warehouse
+    ticks: [32, 64, 96, 128, 160, 192]
+
 
   TabularCongestion:
     type: tabular

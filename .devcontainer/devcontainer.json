@@ -2,8 +2,8 @@
   "name": "mapf-gpt-dev",
   "image": "mapf-gpt",
   "runArgs": [
-    "--platform=linux/amd64",
-    "--gpus=all"
+    "--platform", "linux/amd64",
+    "--gpus", "all"
   ],
   "workspaceFolder": "/workspace",
   "mounts": [
@@ -15,5 +15,10 @@
   "settings": {
     "terminal.integrated.defaultProfile.linux": "zsh"
   },
+  "features": {
+  "ghcr.io/devcontainers/features/nvidia-cuda:2": {
+    "version": "11.8"
+  }
+},
   "postCreateCommand": "echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate pogema' >> ~/.zshrc"
 }

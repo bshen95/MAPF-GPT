@@ -22,7 +22,7 @@ def main():
                         help='Maximum episode steps (default: %(default)d)')
     parser.add_argument('--show_map_names', action='store_true', help='Shows names of all available maps')
 
-    parser.add_argument('--model', type=str, choices=['2M', '6M', '85M','EP','EP2','EP3','EP4'], default='2M',
+    parser.add_argument('--model', type=str, choices=['2M', '6M', '85M','EP','EP2','EP3','EP4','EP5'], default='2M',
                         help='Model to use: 2M, 6M, 85M (default: %(default)s)')
     
 
@@ -68,6 +68,8 @@ def main():
         algo = MAPFGPTInference(MAPFGPTInferenceConfig(path_to_weights=f'weights/expert-v2.pt', device=args.device))
     elif(args.model == 'EP4'):
         algo = MAPFGPTInference(MAPFGPTInferenceConfig(path_to_weights=f'weights/expert-2M-v2.pt', device=args.device))
+    elif(args.model == 'EP5'):
+        algo = MAPFGPTInference(MAPFGPTInferenceConfig(path_to_weights=f'weights/expert-2M-v3.pt', device=args.device))
     else:
         algo = MAPFGPTInference(MAPFGPTInferenceConfig(path_to_weights=f'weights/model-{args.model}.pt', device=args.device))
     algo.reset_states()
