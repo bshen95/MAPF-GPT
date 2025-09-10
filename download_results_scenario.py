@@ -14,14 +14,49 @@ RESULTS_DIR = BASE_DIR + "/results"
 MAPS_YAML = BASE_DIR + "/maps_config.yaml"
 from pogema_toolbox.generators.generator_utils import maps_dict_to_yaml
 
+USE_LACGECY = True
+headers = {}
+if USE_LACGECY:
+    BASE_BEN_URL = "http://118.138.234.90/quickDownload/benchmarks/"
+    BASE_RES_URL = "http://118.138.234.90/quickDownload/results/"
+    headers['Host'] = 'tracker-legacy.pathfinding.ai'
+
+# hosts = {
+#     'tracker-legacy.pathfinding.ai': '118.138.234.90'
+# }
+
+# def make_request(hostname, path):
+#     headers = {}
+#     if hostname in hosts:
+#         headers['Host'] = hostname
+#         hostname = hosts[hostname]
+#     url = 'http://%s%s' % (hostname, path)
+#     print(f"Making request to {url} with headers {headers}")
+#     return requests.get(url, headers=headers)
+
+# r = make_request('tracker-legacy.pathfinding.ai', '/index.html')
 
 
 
-
-
-
+def download_file(url, dest_path):
+    if USE_LACGECY:
+        r = requests.get(url, headers=headers, stream=True)
+    else:
+        r = requests.get(url, stream=True)
+    if r.status_code == 200:
+        with open(dest_path, "wb") as f:
+            for chunk in r.iter_content(8192):
+                f.write(chunk)
+        return True
+    else:
+        print(f"Failed to download {url} - Status code {r.status_code}")
+        return False
+    
 def download_moving_ai_maps(url):
-    response = requests.get(url)
+    if USE_LACGECY:
+        response = requests.get(url, headers=headers)
+    else:
+        response = requests.get(url)
 
     zip_file = io.BytesIO(response.content)
 
@@ -67,7 +102,11 @@ def map_to_grid(file, remove_border=False):
 def generate_maps_yaml(output_path=MAPS_YAML):
     ensure_dirs()
     # 1. Download index page
-    resp = requests.get(BASE_BEN_URL)
+    if USE_LACGECY:
+        resp = requests.get(BASE_BEN_URL, headers=headers)
+    else:
+        resp = requests.get(BASE_BEN_URL)
+
     resp.raise_for_status()
 
     # 2. Find all .zip links
@@ -91,17 +130,6 @@ def generate_maps_yaml(output_path=MAPS_YAML):
 
     print(f"Wrote {len(map_names)} map(s) to {output_path}")
 
-
-def download_file(url, dest_path):
-    r = requests.get(url, stream=True)
-    if r.status_code == 200:
-        with open(dest_path, "wb") as f:
-            for chunk in r.iter_content(8192):
-                f.write(chunk)
-        return True
-    else:
-        print(f"Failed to download {url} - Status code {r.status_code}")
-        return False
 
 def unzip_file(zip_path, extract_to):
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:

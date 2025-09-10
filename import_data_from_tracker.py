@@ -658,7 +658,8 @@ def worker(args):
     process_entire_files(maps, temp_path, output_path)
 
 
-def pogema_2_OA_pairs_top_10():
+def pogema_2_OA_pairs_top_10(): 
+    #spliting the result jason into 50 parts, and then only process top 10 pairs. 
     maps = load_yaml_file("movingAI/maps.yaml")
     map_configs = load_yaml_file("movingAI/maps_config.yaml")
     Path(DATASET_FOLDER).mkdir(parents=True, exist_ok=True) 
@@ -729,24 +730,45 @@ def pogema_2_OA_pairs():
         # process_per_scenarios_file(map_name)
         # process_per_map(map_name)
 
+def split_the_data():
+    # Source directory where your .arrow files are located
+    source_dir = "dataset/"
+
+    # Destination directories
+    train_dir = os.path.join(source_dir, "train")
+    test_dir = os.path.join(source_dir, "validation")
+
+    # Create training and testing folders if they don't exist
+    os.makedirs(train_dir, exist_ok=True)
+    os.makedirs(test_dir, exist_ok=True)
+
+    # Loop through all files in source directory
+    for filename in os.listdir(source_dir):
+        if filename.endswith(".arrow"):
+            file_path = os.path.join(source_dir, filename)
+            
+            # Files ending with "_0.arrow" → testing
+            if filename.endswith("_0.arrow"):
+                shutil.move(file_path, os.path.join(test_dir, filename))
+            # All other .arrow files → training
+            else:
+                shutil.move(file_path, os.path.join(train_dir, filename))
+
+    print("Files have been organized into training and testing folders.")
 
 def main():
     # Step 1: Download scenarios and results from tracker.
-    # maps_config = {"maps": [entry["name"] for entry in MAP_CONFIG["maps"]] }
-    # download_scenarios_and_results(maps_config)
-    # # load_movingAI_maps()
-    # tracker_data_2_pogema()
-    # pogema_2_OA_pairs()
+    maps_config = {"maps": [entry["name"] for entry in MAP_CONFIG["maps"]] }
+    download_scenarios_and_results(maps_config)
+
+    # Step 2: Convert the tracker results to pogema results formate.
+    tracker_data_2_pogema()
+
+    # Step 3: Convert the pogema results to observation and action pairs, used for training.
     pogema_2_OA_pairs_top_10()
-    # process_individual_map("room-32-32-4")
-    # # Step 2: Convert the csv to MAPF-GPT format.
-    # # load_movingAI_maps()
-    # files = [f"{EXPERT_DATA_FOLDER}/{m['name']}/Expert.json" for m in MAP_CONFIG['maps']]
 
-    # # this function split the map-based json 
-    # with mp.Pool() as pool:
-
-    # pool.map(split_json, files)
+    # Step 4: Orgainize the data into train and validation folders.
+    split_the_data()
 
 
 
